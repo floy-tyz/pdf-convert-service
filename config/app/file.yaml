@@ -1,0 +1,4 @@
+parameters:
+
+    # Общая папка расположения файлов
+    files_storage_dir: '%env(string:STORAGE_DIRECTORY)%'
