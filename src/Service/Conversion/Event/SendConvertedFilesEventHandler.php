@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Event;
+namespace App\Service\Conversion\Event;
 
 use App\Service\Conversion\Client\ConversionClientInterface;
 use App\Service\File\Interface\FileManagerInterface;

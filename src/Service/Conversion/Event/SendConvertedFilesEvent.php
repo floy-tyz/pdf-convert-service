@@ -1,9 +1,6 @@
 <?php
 
-namespace App\Event;
-
-use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\Messenger\MessageBusInterface;
+namespace App\Service\Conversion\Event;
 
 readonly class SendConvertedFilesEvent
 {

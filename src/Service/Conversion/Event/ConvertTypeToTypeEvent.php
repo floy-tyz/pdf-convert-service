@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Event;
+namespace App\Service\Conversion\Event;
 
-readonly class ConvertDocxToPdfEvent
+readonly class ConvertTypeToTypeEvent
 {
     public function __construct(
         private string $conversionUuid,
+        private string $outputExtension,
         private array $filesPaths,
     ) {
     }
@@ -21,5 +22,10 @@ readonly class ConvertDocxToPdfEvent
     public function getFilesPaths(): array
     {
         return $this->filesPaths;
+    }
+
+    public function getOutputExtension(): string
+    {
+        return $this->outputExtension;
     }
 }

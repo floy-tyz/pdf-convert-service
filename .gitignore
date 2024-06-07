@@ -10,3 +10,5 @@
 
 /supervisord.log
 supervisord.pid
+
+/.idea/

@@ -50,16 +50,11 @@ services:
         volumes:
             ###> BASH VOLUMES ###
             - ./bash/.bash_aliases:/home/${USER}/.bash_aliases
-            - ./bash/.bash_history:/root/.bash_history
+            - ./bash/.bash_history:/${USER}/.bash_history
             - ./bash/.bashrc:/home/${USER}/.bashrc
             ###> COMPOSER VOLUMES ###
             - ${COMPOSER_CONFIG_PATH:-./composer/.config}:/home/${USER}/.composer
             - ${COMPOSER_CACHE_PATH:-./composer/.cache}:/home/${USER}/.cache/composer
-            ###> DOCKER USER VOLUMES
-            - /home/${USER}/.ssh:/home/${USER}/.ssh:rw
-            - /etc/group:/etc/group:ro
-            - /etc/passwd:/etc/passwd:ro
-            - /etc/shadow:/etc/shadow:ro
             ###> TIMEZONE VOLUMES
             - /etc/localtime:/etc/localtime:ro
             ###> PHP INI VOLUME
@@ -70,7 +65,7 @@ services:
             ###> XDEBUG ###
             - ./app/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
         extra_hosts:
-            - pdf.local:${DOCKER_IP}
+            - api.pdf.local:${DOCKER_IP}
         networks:
             - backend
             - rabbitmq

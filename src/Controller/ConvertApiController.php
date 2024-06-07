@@ -2,11 +2,14 @@
 
 namespace App\Controller;
 
-use App\Event\ConvertDocxToPdfEvent;
+use App\Bus\EventBusInterface;
+use App\Service\Conversion\Event\CombineTypesToTypeEvent;
+use App\Service\Conversion\Event\ConvertTypeToTypeEvent;
+use App\Service\Conversion\Event\SaveSourceFilesEvent;
 use App\Service\File\Interface\FileManagerInterface;
 use App\Traits\ResponseStatusTrait;
+use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Messenger\MessageBusInterface;
@@ -18,24 +21,54 @@ class ConvertApiController extends AbstractController
 
     public function __construct(
         private readonly MessageBusInterface $messageBus,
+        private readonly EventBusInterface $eventBus,
         private readonly FileManagerInterface $fileManager,
     ) {
     }
 
-    #[Route('/api/v1/convert', name: 'app_convert_api', methods: ['POST'])]
-    public function index(Request $request): JsonResponse
+    /**
+     * @throws Exception
+     */
+    #[Route('/api/v1/convert', name: 'app.unoconvert.convert', methods: ['POST'])]
+    public function convert(Request $request): JsonResponse
     {
-        $tmpFilesPaths = [];
-
-        /** @var UploadedFile $file */
-        foreach ($request->files->all() as $file) {
-            $tmpFilePath = $this->fileManager->getTempDirectoryPath() . DIRECTORY_SEPARATOR . $file->getClientOriginalName();
-            file_put_contents($tmpFilePath, file_get_contents($file->getPathname()));
-            $tmpFilesPaths[] = $tmpFilePath;
+        if (!$request->request->get('uuid') || !$request->request->get('output_extension')) {
+            throw new Exception('uuid and output_extension is required.');
         }
 
-        $this->messageBus->dispatch(new ConvertDocxToPdfEvent(
+        $tmpFilesPaths = $this->eventBus->publish(new SaveSourceFilesEvent(
+                $request->files->all(),
+            )
+        );
+
+        $this->messageBus->dispatch(new ConvertTypeToTypeEvent(
                 $request->request->get('uuid'),
+                $request->request->get('output_extension'),
+                $tmpFilesPaths
+            )
+        );
+
+        return $this->success();
+    }
+
+    /**
+     * @throws Exception
+     */
+    #[Route('/api/v1/combine', name: 'app.unoconvert.combine', methods: ['POST'])]
+    public function combine(Request $request): JsonResponse
+    {
+        if (!$request->request->get('uuid') || !$request->request->get('output_extension')) {
+            throw new Exception('uuid or output_extension is required.');
+        }
+
+        $tmpFilesPaths = $this->eventBus->publish(new SaveSourceFilesEvent(
+                $request->files->all(),
+            )
+        );
+
+        $this->messageBus->dispatch(new CombineTypesToTypeEvent(
+                $request->request->get('uuid'),
+                $request->request->get('output_extension'),
                 $tmpFilesPaths
             )
         );

@@ -16,7 +16,6 @@ readonly class ConversionHttpClientInterface implements ConversionClientInterfac
 
     public function __construct(
         private HttpClientInterface $conversionClient,
-        private ParameterBagInterface $parameterBag,
     ) {
     }
 
@@ -44,6 +43,34 @@ readonly class ConversionHttpClientInterface implements ConversionClientInterfac
         $content = $this->conversionClient->request(
             'POST',
             "/api/v1/conversion/$conversionUuid/files/converted",
+            [
+                'headers' => $formData->getPreparedHeaders()->toArray(),
+                'body' => $formData->bodyToIterable(),
+            ]
+        );
+
+        return $content->getContent();
+    }
+
+    /**
+     * @throws TransportExceptionInterface
+     * @throws ServerExceptionInterface
+     * @throws RedirectionExceptionInterface
+     * @throws ClientExceptionInterface
+     */
+    public function requestSendCombinedFile(string $conversionUuid, string $combinedFilePath): string
+    {
+        $formFields = [
+            'uuid' => $conversionUuid,
+        ];
+
+        $formFields[pathinfo($combinedFilePath, PATHINFO_FILENAME)] = DataPart::fromPath($combinedFilePath);
+
+        $formData = new FormDataPart($formFields);
+
+        $content = $this->conversionClient->request(
+            'POST',
+            "/api/v1/conversion/$conversionUuid/files/combined",
             [
                 'headers' => $formData->getPreparedHeaders()->toArray(),
                 'body' => $formData->bodyToIterable(),

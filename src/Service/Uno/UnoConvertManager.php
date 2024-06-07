@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class UnoConvertManager implements UnoConvertInterface
 {
-    const UNOCONVERT = 'unoconvert';
+    const string UNOCONVERT = 'unoconvert';
 
     public function convert(string $sourceFilePath, string $destinationFilePath, array $context = []): void
     {
