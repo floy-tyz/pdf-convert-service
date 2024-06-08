@@ -46,6 +46,8 @@ RUN apk del autoconf g++ make \
     && rm -rf /var/cache/apk/* /tmp/* /var/tmp/* \
     && fc-cache -f
 
+RUN pip install --break-system-packages unoserver
+
 WORKDIR /var/www/html
 
 COPY . /var/www/html
