@@ -1,18 +1,18 @@
 <?php
 
-namespace App\Service\Conversion\Event;
+namespace App\Service\Process\Event;
 
-readonly class SendConvertedFilesEvent
+readonly class SendProcessedFilesEvent
 {
     public function __construct(
-        private string $conversionUuid,
+        private string $processUuid,
         private array $filesPaths,
     ) {
     }
 
-    public function getConversionUuid(): string
+    public function getProcessUuid(): string
     {
-        return $this->conversionUuid;
+        return $this->processUuid;
     }
 
     /**

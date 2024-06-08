@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service\Conversion\Event;
+namespace App\Service\Process\Event;
 
 use App\Bus\EventInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;

@@ -3,7 +3,7 @@ parameters:
 framework:
   http_client:
     scoped_clients:
-      conversion.client:
+      process.client:
         base_uri: '%env(string:CONVERSION_BASE_URL)%'
         retry_failed:
           enabled: true

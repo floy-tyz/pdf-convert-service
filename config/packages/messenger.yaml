@@ -25,11 +25,8 @@ framework:
                     max_delay: 0
         
         routing:
-            App\Service\Conversion\Event\ConvertTypeToTypeEvent: async_transport
-            App\Service\Conversion\Event\SendConvertedFilesEvent: async_transport
-            
-            App\Service\Conversion\Event\CombineTypesToTypeEvent: async_transport
-            App\Service\Conversion\Event\SendCombinedFileEvent: async_transport
+            App\Service\Process\Factory\Event\ProcessOfficeToPdfEvent: async_transport
+            App\Service\Process\Factory\Event\ProcessImagesToPdfEvent: async_transport
 
 # when@test:
 #    framework:

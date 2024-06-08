@@ -1,20 +1,16 @@
 <?php
 
-namespace App\Service\Conversion\Event;
+namespace App\Service\Process\Event;
 
+use App\Bus\EventHandlerInterface;
 use App\Service\File\Interface\FileManagerInterface;
-use App\Service\Uno\UnoConvertInterface;
 use Imagick;
 use ImagickException;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Uid\Uuid;
 
-#[AsMessageHandler]
-readonly class CombineTypesToTypeEventHandler
+readonly class MergeImagesToTypeEventHandler  implements EventHandlerInterface
 {
     public function __construct(
-        private MessageBusInterface $messageBus,
         private FileManagerInterface $fileManager
     ) {
     }
@@ -22,17 +18,17 @@ readonly class CombineTypesToTypeEventHandler
     /**
      * @throws ImagickException
      */
-    public function __invoke(CombineTypesToTypeEvent $event): void
+    public function __invoke(MergeImagesToTypeEvent $event): array
     {
         $destinationFilePath = $this->fileManager->getTempDirectoryPath()
             . DIRECTORY_SEPARATOR
             . Uuid::v4()
             . "."
-            . $event->getOutputExtension();
+            . $event->getExtension();
 
         $generalFile = new Imagick();
 
-        $generalFile->setFormat($event->getOutputExtension());
+        $generalFile->setFormat($event->getExtension());
 
         foreach ($event->getFilesPaths() as $filesPath) {
             $image = new Imagick($filesPath);
@@ -41,9 +37,6 @@ readonly class CombineTypesToTypeEventHandler
 
         $generalFile->writeImages($destinationFilePath, true);
 
-        $this->messageBus->dispatch(new SendCombinedFileEvent(
-            $event->getConversionUuid(),
-            $destinationFilePath,
-        ));
+        return [$destinationFilePath];
     }
 }

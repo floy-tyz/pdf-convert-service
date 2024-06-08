@@ -1,23 +1,20 @@
 <?php
 
-namespace App\Service\Conversion\Event;
+namespace App\Service\Process\Event;
 
+use App\Bus\EventHandlerInterface;
 use App\Service\File\Interface\FileManagerInterface;
 use App\Service\Uno\UnoConvertInterface;
-use Symfony\Component\Messenger\Attribute\AsMessageHandler;
-use Symfony\Component\Messenger\MessageBusInterface;
 
-#[AsMessageHandler]
-readonly class ConvertTypeToTypeEventHandler
+readonly class ConvertTypeToTypeEventHandler implements EventHandlerInterface
 {
     public function __construct(
-        private MessageBusInterface $messageBus,
         private UnoConvertInterface $unoConvert,
         private FileManagerInterface $fileManager
     ) {
     }
 
-    public function __invoke(ConvertTypeToTypeEvent $event): void
+    public function __invoke(ConvertTypeToTypeEvent $event): array
     {
         $convertedFiles = [];
 
@@ -27,16 +24,13 @@ readonly class ConvertTypeToTypeEventHandler
                 . DIRECTORY_SEPARATOR
                 . pathinfo($filepath, PATHINFO_FILENAME)
                 . "."
-                . $event->getOutputExtension();
+                . $event->getExtension();
 
             $this->unoConvert->convert($filepath, $destinationFilePath);
 
             $convertedFiles[] = $destinationFilePath;
         }
 
-        $this->messageBus->dispatch(new SendConvertedFilesEvent(
-            $event->getConversionUuid(),
-            $convertedFiles,
-        ));
+        return $convertedFiles;
     }
 }
