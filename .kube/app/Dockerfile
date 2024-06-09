@@ -50,6 +50,8 @@ RUN pip install --break-system-packages unoserver
 
 USER www-data
 
+COPY --from=composer:2.1 /usr/bin/composer /usr/bin/composer
+
 WORKDIR /var/www/html
 
 COPY --chown=www-data:www-data composer.json composer.lock ./
