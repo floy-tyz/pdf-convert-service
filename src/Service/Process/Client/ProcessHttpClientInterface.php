@@ -35,11 +35,9 @@ readonly class ProcessHttpClientInterface implements ProcessClientInterface
         $formData = ['uuid' => $processUuid];
 
         foreach ($processedFilesPaths as $filePath) {
-            $formData[] = [
-                'name' => 'files[]',
-                'contents' => fopen($filePath, 'r'),
-                'filename' => pathinfo($filePath, PATHINFO_FILENAME),
-            ];
+            $fileHandle = fopen($filePath, 'r');
+            stream_context_set_option($fileHandle, 'http', 'filename', basename($filePath));
+            $formData[pathinfo($filePath, PATHINFO_FILENAME)] = $fileHandle;
         }
 
         $content = $this->processClient->request(
