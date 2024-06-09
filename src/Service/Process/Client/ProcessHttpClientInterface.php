@@ -32,25 +32,24 @@ readonly class ProcessHttpClientInterface implements ProcessClientInterface
      */
     public function requestSendProcessedFiles(string $processUuid, array $processedFilesPaths): string
     {
-        $formFields = [
-            'uuid' => $processUuid,
-        ];
+        $formData = ['uuid' => $processUuid];
 
         foreach ($processedFilesPaths as $filePath) {
-            $formFields[pathinfo($filePath, PATHINFO_FILENAME)] = DataPart::fromPath($filePath);
+            $formData[] = [
+                'name' => 'files[]',
+                'contents' => fopen($filePath, 'r'),
+                'filename' => pathinfo($filePath, PATHINFO_FILENAME),
+            ];
         }
-
-        $formData = new FormDataPart($formFields);
-
-        $this->logger->critical('FORMDATA' . serialize($formData));
-        $this->logger->critical('FORMDATA', [$formData]);
 
         $content = $this->processClient->request(
             'POST',
             "/api/v1/process/$processUuid/files",
             [
-                'headers' => $formData->getPreparedHeaders()->toArray(),
-                'body' => $formData->bodyToIterable(),
+                'headers' => [
+                    'Content-Type' => 'multipart/form-data',
+                ],
+                'body' => $formData,
             ]
         );
 
