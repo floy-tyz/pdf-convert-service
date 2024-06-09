@@ -8,6 +8,7 @@ use App\Service\Process\Event\MergeImagesToTypeEvent;
 use App\Service\Process\Event\OptimizePdfEvent;
 use App\Service\Process\Event\SendProcessedFilesEvent;
 use App\Service\Process\Map\ProcessContextMap;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -16,7 +17,8 @@ readonly class ProcessImagesToPdfEventHandler
 {
     public function __construct(
         private MessageBusInterface $messageBus,
-        private EventBusInterface $eventBus
+        private EventBusInterface $eventBus,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -40,6 +42,9 @@ readonly class ProcessImagesToPdfEventHandler
                 $event->getFilesPaths()
             ));
         }
+
+        $this->logger->debug("MESSAGES COUNT " . count($files));
+        $this->logger->debug("MESSAGES DESTINATION " . implode(', ', $files));
 
         $this->messageBus->dispatch(new SendProcessedFilesEvent(
             $event->getProcessUuid(),
