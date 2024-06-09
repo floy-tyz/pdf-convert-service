@@ -43,7 +43,7 @@ when@prod:
                 path: "php://stderr"
                 level: error
                 formatter: App\Service\Monolog\JsonFormatter
-                channels: ["security", "request"]
+                channels: ["request"]
             
             php:
                 type: stream
