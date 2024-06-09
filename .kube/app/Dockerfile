@@ -48,12 +48,14 @@ RUN apk del autoconf g++ make \
 
 RUN pip install --break-system-packages unoserver
 
+USER www-data
+
 WORKDIR /var/www/html
 
-COPY . /var/www/html
+COPY --chown=www-data:www-data . /var/www/html
 
 COPY --from=composer:2.1 /usr/bin/composer /usr/bin/composer
 
-RUN composer i
+RUN composer install --no-dev --optimize-autoloader
 
 CMD ["supervisord"]
