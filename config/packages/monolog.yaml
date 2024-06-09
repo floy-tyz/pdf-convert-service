@@ -36,4 +36,25 @@ when@prod:
                 path: "php://stderr"
                 level: debug
                 formatter: App\Service\Monolog\JsonFormatter
+                channels: [ "!event", "!doctrine", "!request", "!security", "!php", "!messenger" ]
+                
+            security:
+                type: stream
+                path: "php://stderr"
+                level: error
+                formatter: App\Service\Monolog\JsonFormatter
+                channels: ["security", "request"]
             
+            php:
+                type: stream
+                path: "php://stderr"
+                level: warning
+                formatter: App\Service\Monolog\JsonFormatter
+                channels: [ "php" ]
+            
+            messenger:
+                type: stream
+                path: "php://stderr"
+                level: warning
+                formatter: App\Service\Monolog\JsonFormatter
+                channels: [ "messenger" ]
