@@ -35,3 +35,5 @@ when@prod:
                 type: stream
                 path: "php://stderr"
                 level: debug
+                formatter: App\Service\Monolog\JsonFormatter
+            
