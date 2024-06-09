@@ -2,6 +2,7 @@
 
 namespace App\Service\Process\Client;
 
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Mime\Part\DataPart;
 use Symfony\Component\Mime\Part\Multipart\FormDataPart;
@@ -16,6 +17,7 @@ readonly class ProcessHttpClientInterface implements ProcessClientInterface
 
     public function __construct(
         private HttpClientInterface $processClient,
+        private LoggerInterface $logger
     ) {
     }
 
@@ -39,6 +41,9 @@ readonly class ProcessHttpClientInterface implements ProcessClientInterface
         }
 
         $formData = new FormDataPart($formFields);
+
+        $this->logger->critical('FORMDATA' . serialize($formData));
+        $this->logger->critical('FORMDATA', [$formData]);
 
         $content = $this->processClient->request(
             'POST',
