@@ -52,10 +52,10 @@ USER www-data
 
 WORKDIR /var/www/html
 
-COPY --chown=www-data:www-data . /var/www/html
-
-COPY --from=composer:2.1 /usr/bin/composer /usr/bin/composer
+COPY --chown=www-data:www-data composer.json composer.lock ./
 
 RUN composer install --no-dev --optimize-autoloader
+
+COPY --chown=www-data:www-data . .
 
 CMD ["supervisord"]

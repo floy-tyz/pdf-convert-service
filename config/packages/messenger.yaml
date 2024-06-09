@@ -27,6 +27,7 @@ framework:
         routing:
             App\Service\Process\Factory\Event\ProcessOfficeToPdfEvent: async_transport
             App\Service\Process\Factory\Event\ProcessImagesToPdfEvent: async_transport
+            App\Service\Process\Event\SendProcessedFilesEvent: async_transport
 
 # when@test:
 #    framework:
