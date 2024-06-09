@@ -56,8 +56,10 @@ WORKDIR /var/www/html
 
 COPY --chown=www-data:www-data composer.json composer.lock ./
 
-RUN composer install --no-dev --optimize-autoloader
+RUN composer install --no-scripts --no-dev --optimize-autoloader
 
 COPY --chown=www-data:www-data . .
+
+RUN composer run-script post-install-cmd
 
 CMD ["supervisord"]
