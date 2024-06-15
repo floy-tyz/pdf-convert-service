@@ -18,7 +18,6 @@ readonly class ProcessImagesToPdfEventHandler
     public function __construct(
         private MessageBusInterface $messageBus,
         private EventBusInterface $eventBus,
-        private LoggerInterface $logger
     ) {
     }
 
@@ -42,9 +41,6 @@ readonly class ProcessImagesToPdfEventHandler
                 $event->getFilesPaths()
             ));
         }
-
-        $this->logger->critical("MESSAGES COUNT " . count($files));
-        $this->logger->critical("MESSAGES DESTINATION " . serialize($files));
 
         $this->messageBus->dispatch(new SendProcessedFilesEvent(
             $event->getProcessUuid(),

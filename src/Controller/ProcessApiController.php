@@ -3,15 +3,12 @@
 namespace App\Controller;
 
 use App\Bus\EventBusInterface;
-use App\Service\Process\Event\MergeImagesToTypeEvent;
-use App\Service\Process\Event\ConvertTypeToTypeEvent;
 use App\Service\Process\Event\SaveSourceFilesEvent;
 use App\Service\File\Interface\FileManagerInterface;
 use App\Service\Process\Factory\ProcessFactoryEvent;
 use App\Traits\ResponseStatusTrait;
 use Exception;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;

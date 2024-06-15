@@ -76,7 +76,7 @@ networks:
         name: ${CONTAINER_NAME:-unnamed}_backend_network
     
     rabbitmq:
-        name: ${RABBITMQ_NETWORK_NAME:-pdf_frontend_rabbitmq}
+        name: ${RABBITMQ_NETWORK_NAME:-pdf_api_rabbitmq}
         external: true
         
     reverse-proxy:
