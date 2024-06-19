@@ -1,33 +1,46 @@
 framework:
     messenger:
-        
         default_bus: event.bus
         buses:
+            async.bus:
+                default_middleware:
+                    allow_no_handlers: true
             event.bus:
                 default_middleware:
                     enabled: true
-                    # set "allow_no_handlers" to true (default is false) to allow having
-                    # no handler configured for this bus without throwing an exception
                     allow_no_handlers: false
-                    # set "allow_no_senders" to false (default is true) to throw an exception
-                    # if no sender is configured for this bus
                     allow_no_senders: true
                 middleware:
                     - validation
         
         transports:
-            async_transport:
+            process_files:
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: 'process_files'
+                    queues:
+                        process_files_queue: ~
                 retry_strategy:
                     max_retries: 5
                     delay: 2000
                     multiplier: 3
                     max_delay: 0
-        
+            
+            save_processed_files:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    exchange:
+                        name: 'save_processed_files'
+                    queues:
+                        save_processed_files_queue: ~
+
         routing:
-            App\Service\Process\Factory\Event\ProcessOfficeToPdfEvent: async_transport
-            App\Service\Process\Factory\Event\ProcessImagesToPdfEvent: async_transport
-            App\Service\Process\Event\SendProcessedFilesEvent: async_transport
+            App\Service\Process\Event\External\ProcessFilesEvent: process_files
+            App\Service\Process\Factory\Event\ProcessOfficeToPdfEvent: process_files
+            App\Service\Process\Factory\Event\ProcessImagesToPdfEvent: process_files
+            
+            App\Service\Process\Event\External\SaveProcessedFilesEvent: save_processed_files
 
 # when@test:
 #    framework:

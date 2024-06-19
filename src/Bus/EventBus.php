@@ -9,16 +9,16 @@ use Symfony\Component\Messenger\HandleTrait;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Throwable;
 
-final class EventCommandBus implements EventBusInterface
+final class EventBus implements EventBusInterface
 {
     use HandleTrait;
 
     private MessageBusInterface $messageBus;
 
     public function __construct(
-        MessageBusInterface $messageBus
+        MessageBusInterface $eventBus
     ) {
-        $this->messageBus = $messageBus;
+        $this->messageBus = $eventBus;
     }
 
     /**

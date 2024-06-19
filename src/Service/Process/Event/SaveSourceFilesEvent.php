@@ -8,15 +8,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 readonly class SaveSourceFilesEvent implements EventInterface
 {
     /**
-     * @param array<UploadedFile> $sourceFiles
+     * @param array<string> $filesUuids
      */
     public function __construct(
-        private array $sourceFiles,
+        private array $filesUuids,
     ) {
     }
 
-    public function getSourceFiles(): array
+    public function getFilesUuids(): array
     {
-        return $this->sourceFiles;
+        return $this->filesUuids;
     }
 }

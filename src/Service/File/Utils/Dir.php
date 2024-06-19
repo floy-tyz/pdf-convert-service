@@ -2,17 +2,20 @@
 
 namespace App\Service\File\Utils;
 
-use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Exception;
 
 class Dir
 {
+    /**
+     * @throws Exception
+     */
     public static function checkFileExist(string $filepath): void
     {
         if (!file_exists($filepath)) {
 
             $fileName = basename($filepath);
 
-            throw new FileException("Не удалось найти файл '{$fileName}'");
+            throw new Exception("File not found '$fileName'");
         }
     }
 

@@ -2,22 +2,19 @@
 
 namespace App\Service\Process\Event;
 
-readonly class SendProcessedFilesEvent
+use App\Bus\EventInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+
+readonly class PutProcessedFilesToStorageEvent implements EventInterface
 {
+    /**
+     * @param array<string> $filesPaths
+     */
     public function __construct(
-        private string $processUuid,
         private array $filesPaths,
     ) {
     }
 
-    public function getProcessUuid(): string
-    {
-        return $this->processUuid;
-    }
-
-    /**
-     * @return array
-     */
     public function getFilesPaths(): array
     {
         return $this->filesPaths;

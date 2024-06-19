@@ -3,12 +3,16 @@
 namespace App\Service\Process\Event;
 
 use App\Bus\EventHandlerInterface;
+use App\Service\Aws\S3\S3AdapterInterface;
 use App\Service\File\Interface\FileManagerInterface;
 
 readonly class SaveSourceFilesEventHandler implements EventHandlerInterface
 {
+    const string S3_BUCKET = 'non-processed-files';
+
     public function __construct(
-        private FileManagerInterface $fileManager
+        private FileManagerInterface $fileManager,
+        private S3AdapterInterface $s3Service
     ) {
     }
 
@@ -16,11 +20,11 @@ readonly class SaveSourceFilesEventHandler implements EventHandlerInterface
     {
         $tmpFilesPaths = [];
 
-        foreach ($event->getSourceFiles() as $file) {
+        foreach ($event->getFilesUuids() as $file) {
 
-            $tmpFilePath = $this->fileManager->getTempDirectoryPath() . DIRECTORY_SEPARATOR . $file->getClientOriginalName();
+            $tmpFilePath = $this->fileManager->getTempDirectoryPath() . DIRECTORY_SEPARATOR . $file;
 
-            file_put_contents($tmpFilePath, file_get_contents($file->getPathname()));
+            file_put_contents($tmpFilePath, $this->s3Service->getObjectContent(self::S3_BUCKET, $file));
 
             $tmpFilesPaths[] = $tmpFilePath;
         }

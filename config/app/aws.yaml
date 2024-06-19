@@ -1,0 +1,15 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+        
+    App\Service\Aws\S3\S3Adapter:
+        arguments:
+            $endpoint: '%env(string:AWS_S3_BASE_URL)%'
+            $region: 'eu-central-1'
+            $version: '%env(string:AWS_S3_VERSION)%'
+            $credentials: {
+                key: '%env(string:AWS_S3_ACCESS_KEY)%',
+                secret: '%env(string:AWS_S3_SECRET_KEY)%'
+            }
+    App\Service\Aws\S3\S3AdapterInterface: '@App\Service\Aws\S3\S3Adapter'
