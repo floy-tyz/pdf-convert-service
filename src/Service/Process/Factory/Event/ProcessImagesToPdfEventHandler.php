@@ -3,8 +3,8 @@
 namespace App\Service\Process\Factory\Event;
 
 use App\Bus\AsyncBusInterface;
-use App\Bus\AsyncHandlerInterface;
 use App\Bus\EventBusInterface;
+use App\Bus\EventHandlerInterface;
 use App\Service\Process\Event\ConvertTypeToTypeEvent;
 use App\Service\Process\Event\External\SaveProcessedFilesEvent;
 use App\Service\Process\Event\MergeImagesToTypeEvent;
@@ -12,7 +12,7 @@ use App\Service\Process\Event\OptimizePdfEvent;
 use App\Service\Process\Event\PutProcessedFilesToStorageEvent;
 use App\Service\Process\Map\ProcessContextMap;
 
-readonly class ProcessImagesToPdfEventHandler implements AsyncHandlerInterface
+readonly class ProcessImagesToPdfEventHandler implements EventHandlerInterface
 {
     public function __construct(
         private AsyncBusInterface $asyncBus,

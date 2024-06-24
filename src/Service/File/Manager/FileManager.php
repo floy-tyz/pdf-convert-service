@@ -13,7 +13,7 @@ use Symfony\Component\Uid\Uuid;
 
 class FileManager implements FileManagerInterface
 {
-    private const TEMP_DIRECTORY_NAME = 'tmp';
+    private const string TEMP_DIRECTORY_PATH = '/tmp';
 
     public function __construct(
         private readonly ParameterBagInterface $parameterBag,
@@ -61,16 +61,7 @@ class FileManager implements FileManagerInterface
      */
     public function getTempDirectoryPath(): string
     {
-        $path = $this->parameterBag->get('kernel.project_dir')
-            . DIRECTORY_SEPARATOR
-            . $this->parameterBag->get('files_storage_dir')
-            . DIRECTORY_SEPARATOR
-            . self::TEMP_DIRECTORY_NAME
-        ;
-
-        Dir::createDirectoryIfNotExist($path);
-
-        return $path;
+        return self::TEMP_DIRECTORY_PATH;
     }
 
     /**
@@ -78,7 +69,11 @@ class FileManager implements FileManagerInterface
      */
     public function getTempFilePath(): string
     {
-        return $this->getTempDirectoryPath() . DIRECTORY_SEPARATOR . Uuid::v4();
+        $fileHandleResource = tmpfile();
+
+        $metaData = stream_get_meta_data($fileHandleResource);
+
+        return $metaData['uri'];
     }
 
     /**

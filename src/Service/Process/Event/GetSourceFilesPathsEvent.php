@@ -5,7 +5,7 @@ namespace App\Service\Process\Event;
 use App\Bus\EventInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-readonly class SaveSourceFilesEvent implements EventInterface
+readonly class GetSourceFilesPathsEvent implements EventInterface
 {
     /**
      * @param array<string> $filesUuids

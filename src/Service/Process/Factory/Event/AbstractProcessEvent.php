@@ -2,9 +2,9 @@
 
 namespace App\Service\Process\Factory\Event;
 
-use App\Bus\AsyncInterface;
+use App\Bus\EventInterface;
 
-abstract readonly class AbstractProcessEvent implements AsyncInterface
+abstract readonly class AbstractProcessEvent implements EventInterface
 {
     public function __construct(
         protected string $processUuid,

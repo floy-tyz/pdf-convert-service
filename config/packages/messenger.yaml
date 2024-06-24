@@ -37,8 +37,6 @@ framework:
 
         routing:
             App\Service\Process\Event\External\ProcessFilesEvent: process_files
-            App\Service\Process\Factory\Event\ProcessOfficeToPdfEvent: process_files
-            App\Service\Process\Factory\Event\ProcessImagesToPdfEvent: process_files
             
             App\Service\Process\Event\External\SaveProcessedFilesEvent: save_processed_files
 

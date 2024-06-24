@@ -6,7 +6,7 @@ use App\Bus\EventHandlerInterface;
 use App\Service\Aws\S3\S3AdapterInterface;
 use App\Service\File\Interface\FileManagerInterface;
 
-readonly class SaveSourceFilesEventHandler implements EventHandlerInterface
+readonly class GetSourceFilesPathsEventHandler implements EventHandlerInterface
 {
     const string S3_BUCKET = 'non-processed-files';
 
@@ -16,7 +16,7 @@ readonly class SaveSourceFilesEventHandler implements EventHandlerInterface
     ) {
     }
 
-    public function __invoke(SaveSourceFilesEvent $event): array
+    public function __invoke(GetSourceFilesPathsEvent $event): array
     {
         $tmpFilesPaths = [];
 
