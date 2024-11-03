@@ -37,6 +37,9 @@ stop:                                        ## Остановить
 up:
 	$(DOCKER_COMPOSE) --env-file .env.local -f docker-compose.yaml -p $(CONTAINER_NAME) up --remove-orphans
 
+up-force:
+	$(DOCKER_COMPOSE) --env-file .env.local -f docker-compose.yaml -p $(CONTAINER_NAME) up --remove-orphans --force-recreate
+
 remove:	                                     ## Удалить контейнеры докеров
 	$(DOCKER_COMPOSE) kill
 	$(DOCKER_COMPOSE) rm -v --force

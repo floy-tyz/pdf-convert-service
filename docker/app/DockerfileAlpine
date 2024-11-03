@@ -1,0 +1,80 @@
+# Репозиторий PHP из .env.local
+ARG PHP
+ARG NAME
+# Пока не исправят imagick
+ARG IMAGICK_PHP83_FIX_COMMIT=9df92616f577e38625b96b7b903582a46c064739
+
+# Репозиторий PHP из .env.local
+FROM php:8.3-fpm-alpine
+
+# Установка необходимых пакетов и зависимостей
+RUN apk add --no-cache \
+    bash \
+    curl \
+    py3-pip \
+    linux-headers \
+    libreoffice \
+    supervisor \
+    vim \
+    make \
+    autoconf \
+    g++ \
+    rabbitmq-c-dev \
+    imagemagick \
+    ghostscript \
+    ghostscript-fonts
+
+# Установка необходимых пакетов шрифтов
+RUN apk add --no-cache \
+    groff \
+    freetype-dev \
+    font-noto \
+    font-noto-cjk \
+    font-noto-extra \
+    fonts-crosextra-carlito \
+    terminus-font \
+    ttf-font-awesome \
+    ttf-dejavu \
+    ttf-freefont \
+    ttf-hack \
+    ttf-inconsolata \
+    ttf-liberation \
+    ttf-mononoki \
+    ttf-opensans \
+    font-dejavu \
+    msttcorefonts-installer \
+    fontconfig
+
+# Install PECL extensions separately to isolate issues
+RUN pecl install xdebug && docker-php-ext-enable xdebug
+RUN pecl install amqp && docker-php-ext-enable amqp
+
+# Установка Imagick (временно недоступно из-за бага)
+#RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS imagemagick-dev \
+#    && pecl install imagick \
+#    && docker-php-ext-enable imagick \
+#    && apk del .build-deps
+
+# Установка Imagick (временно недоступно из-за бага)
+RUN apk add --no-cache --virtual .build-deps $PHPIZE_DEPS imagemagick-dev \
+    && curl -L https://github.com/remicollet/imagick/archive/9df92616f577e38625b96b7b903582a46c064739.zip -o /tmp/imagick-issue-php83.zip \
+    && unzip /tmp/imagick-issue-php83.zip -d /tmp \
+    && pecl install /tmp/imagick-9df92616f577e38625b96b7b903582a46c064739/package.xml \
+    && docker-php-ext-enable imagick \
+    && apk del .build-deps
+
+# Установка шрифтов и их кеширование
+RUN update-ms-fonts && fc-cache -r -v
+
+# Очистка
+RUN apk del autoconf g++ make \
+    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/*
+
+# Install unoserver using pip
+RUN pip install --break-system-packages unoserver
+
+# Copy composer from the composer image
+COPY --from=composer:2.1 /usr/bin/composer /usr/bin/composer
+
+# Define the default command to run supervisord
+CMD ["supervisord"]

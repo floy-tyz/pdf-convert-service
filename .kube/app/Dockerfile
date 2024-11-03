@@ -1,52 +1,72 @@
-ARG PHP
-ARG NAME
+# Репозиторий PHP-FPM на ubuntu
+FROM floytyz/php-fpm-ubuntu:latest
 
-FROM $PHP
+ENV DEBIAN_FRONTEND noninteractive
 
-RUN apk add --no-cache \
+# Установка необходимых пакетов и зависимостей
+RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     curl \
-    py3-pip \
-    linux-headers \
-    libreoffice \
+    python3-pip \
     supervisor \
-    vim \
     make \
     autoconf \
     g++ \
-    rabbitmq-c-dev \
-    imagemagick \
+    librabbitmq-dev \
+    libmagickwand-dev \
     ghostscript \
-    ghostscript-fonts \
-    groff \
-    freetype-dev \
-    font-noto \
-    font-noto-cjk \
-    font-noto-extra \
-    terminus-font \
-    ttf-font-awesome \
-    ttf-dejavu \
-    ttf-freefont \
-    ttf-hack \
-    ttf-inconsolata \
-    ttf-liberation \
-    ttf-mononoki \
-    ttf-opensans \
-    fontconfig
+    libgs-dev \
+    unzip
 
+# Установка необходимых пакетов шрифтов
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    fontconfig \
+    fonts-dejavu \
+    fonts-dejavu-core \
+    fonts-dejavu-extra  \
+    fonts-freefont-ttf \
+    fonts-liberation \
+    fonts-noto \
+    fonts-noto-cjk \
+    fonts-noto-extra \
+    fonts-terminus \
+    fonts-font-awesome \
+    fonts-crosextra-carlito
+
+# Установка шрифтов Windows
+RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections \
+    && apt-get install -y ttf-mscorefonts-installer
+
+# Кеширование шрифтов
+RUN mkdir /.cache && chown -R www-data:www-data /.cache/ && fc-cache -fv
+
+# Установка последней версии libreoffice
+RUN apt-get install -y software-properties-common \
+    && add-apt-repository ppa:libreoffice \
+    && apt-get update \
+    && apt install libreoffice -y
+
+# Установка расширений PECL
 RUN pecl install amqp && docker-php-ext-enable amqp
 
-RUN apk add --no-cache --virtual .build-deps \
-    imagemagick-dev \
-    && pecl install imagick \
-    && docker-php-ext-enable imagick \
-    && apk del .build-deps
+# Установка Imagick (альтернативное решение из-за бага)
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    && curl -L https://github.com/remicollet/imagick/archive/9df92616f577e38625b96b7b903582a46c064739.zip -o /tmp/imagick-issue-php83.zip \
+    && unzip /tmp/imagick-issue-php83.zip -d /tmp \
+    && pecl install /tmp/imagick-9df92616f577e38625b96b7b903582a46c064739/package.xml \
+    && docker-php-ext-enable imagick
 
-RUN apk del autoconf g++ make \
-    && rm -rf /var/cache/apk/* /tmp/* /var/tmp/* \
-    && fc-cache -f
+# Очистка
+RUN apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
+    && rm -rf /var/lib/apt/lists/* /tmp/* \
+    && pecl update-channels \
+    && rm -rf /tmp/pear ~/.pearrc \
+	  && docker-php-source delete \
+    && apt autoremove -y \
+    && apt autoclean -y
 
-RUN pip install --break-system-packages unoserver
+# Установка unoserver с помощью pip
+RUN pip install unoserver --break-system-packages
 
 USER www-data
 

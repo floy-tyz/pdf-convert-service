@@ -7,7 +7,7 @@ services:
             context: ./nginx
         restart: unless-stopped
         container_name: ${CONTAINER_NAME:-unnamed}-nginx
-        working_dir: /var/www/app
+        working_dir: /var/www/html
         environment:
             - VIRTUAL_HOST=${DOMAIN}
         depends_on:
@@ -22,7 +22,7 @@ services:
             ###> TIMEZONE VOLUMES
             - /etc/localtime:/etc/localtime:ro
             ###> PROJECT VOLUME ###
-            - ${PROJECT_PATH:-../}:/var/www/app
+            - ${PROJECT_PATH:-../}:/var/www/html
         networks:
             - reverse-proxy
             - backend
@@ -36,7 +36,7 @@ services:
         user: 1000:1000
         restart: unless-stopped
         container_name: ${CONTAINER_NAME:-unnamed}-app
-        working_dir: /var/www/app
+        working_dir: /var/www/html
         stdin_open: true
         tty: true
         environment:
@@ -60,7 +60,7 @@ services:
             ###> PHP INI VOLUME
             - ./app/php.ini:/usr/local/etc/php/conf.d/custom.php.ini
             ###> PROJECT VOLUME ###
-            - ${PROJECT_PATH:-../}:/var/www/app
+            - ${PROJECT_PATH:-../}:/var/www/html
             - ./app/supervisord.conf:/etc/supervisord.conf
             ###> XDEBUG ###
             - ./app/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
