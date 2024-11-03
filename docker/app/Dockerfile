@@ -21,6 +21,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Установка необходимых пакетов шрифтов
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    cabextract \
+    fontforge \
     fontconfig \
     fonts-dejavu \
     fonts-dejavu-core \
@@ -37,6 +39,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Установка шрифтов Windows
 RUN echo "ttf-mscorefonts-installer msttcorefonts/accepted-mscorefonts-eula select true" | debconf-set-selections \
     && apt-get install -y ttf-mscorefonts-installer
+
+# Установка шрифтов Calibri
+RUN wget https://raw.githubusercontent.com/floy-tyz/pdf-calibri-font/refs/heads/main/make.sh -q -O - | bash
 
 # Кеширование шрифтов
 RUN mkdir /.cache && chown -R www-data:www-data /.cache/ && fc-cache -fv
