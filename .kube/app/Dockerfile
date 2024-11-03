@@ -20,6 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 # Установка необходимых пакетов шрифтов
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    cabextract \
+    fontforge \
     fontconfig \
     fonts-dejavu \
     fonts-dejavu-core \
