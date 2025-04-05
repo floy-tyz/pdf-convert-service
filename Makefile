@@ -1,13 +1,9 @@
--include .env.local
+-include .env
 
-ifeq ($(shell command -v docker-compose;),)
-    DOCKER_COMPOSE := docker compose
-else
-    DOCKER_COMPOSE := docker-compose
-endif
+DOCKER_COMPOSE := docker compose
 
 RUN=$(DOCKER_COMPOSE) run --rm app
-EXEC?=$(DOCKER_COMPOSE) exec app
+EXEC?=docker exec -it $(CONTAINER_NAME)-app
 COMPOSER=$(EXEC) composer
 
 POSTGRES_CONF_PHPUNIT=export APP_ENV=postgres
@@ -26,7 +22,7 @@ start-quick: build-quick up db perm
 restart: down up                             ## Перезапуск контейнера
 
 down:
-	$(DOCKER_COMPOSE) --env-file .env.local -p $(CONTAINER_NAME) down
+	$(DOCKER_COMPOSE) -p $(CONTAINER_NAME) down
 
 down-volume:
 	$(DOCKER_COMPOSE) down -v
@@ -35,10 +31,10 @@ stop:                                        ## Остановить
 	$(DOCKER_COMPOSE) stop
 
 up:
-	$(DOCKER_COMPOSE) --env-file .env.local -f docker-compose.yaml -p $(CONTAINER_NAME) up --remove-orphans
+	$(DOCKER_COMPOSE) -f docker-compose.yaml -p $(CONTAINER_NAME) up --remove-orphans
 
 up-force:
-	$(DOCKER_COMPOSE) --env-file .env.local -f docker-compose.yaml -p $(CONTAINER_NAME) up --remove-orphans --force-recreate
+	$(DOCKER_COMPOSE) -f docker-compose.yaml -p $(CONTAINER_NAME) up --remove-orphans --force-recreate
 
 remove:	                                     ## Удалить контейнеры докеров
 	$(DOCKER_COMPOSE) kill
@@ -49,7 +45,7 @@ reset: remove start                          ## Сбрость, пересобр
 
 build:
 	$(DOCKER_COMPOSE) pull --ignore-pull-failures
-	$(DOCKER_COMPOSE) --env-file .env.local -p $(CONTAINER_NAME) build --force-rm --build-arg APP_ENV=dev --pull
+	$(DOCKER_COMPOSE) -p $(CONTAINER_NAME) build --force-rm --build-arg APP_ENV=dev --pull
 
 build-quick:
 	$(DOCKER_COMPOSE) build --force-rm --build-arg APP_ENV=dev
@@ -78,7 +74,7 @@ composer:                                    ## Выполнить composer в �
 	@${COMPOSER} $(c)
 
 app-shell:                                   ## Открыть shell приложения (app)
-	docker exec -it pdf-frontend-app bash
+	@$(EXEC) bash
 
 clear: perm                                  ## Очистить кеш
 	-$(EXEC) rm -rf var/cache/*

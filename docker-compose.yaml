@@ -4,7 +4,7 @@ services:
 
     nginx:
         build:
-            context: ./nginx
+            context: docker/nginx
         restart: unless-stopped
         container_name: ${CONTAINER_NAME:-unnamed}-nginx
         working_dir: /var/www/html
@@ -14,22 +14,22 @@ services:
             - app
         volumes:
             ###> NGINX VOLUMES
-            - ./nginx/conf.d/:/etc/nginx/conf.d
-            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
-            - ./nginx/sites-enabled/app.conf:/etc/nginx/sites-enabled/${CONTAINER_NAME:-unnamed}.conf
-            - ./nginx/logs/access.log:/var/log/nginx/access.log
-            - ./nginx/logs/error.log:/var/log/nginx/error.log
+            - ./docker/nginx/conf.d/:/etc/nginx/conf.d
+            - ./docker/nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./docker/nginx/sites-enabled/app.conf:/etc/nginx/sites-enabled/${CONTAINER_NAME:-unnamed}.conf
+            - ./docker/nginx/logs/access.log:/var/log/nginx/access.log
+            - ./docker/nginx/logs/error.log:/var/log/nginx/error.log
             ###> TIMEZONE VOLUMES
             - /etc/localtime:/etc/localtime:ro
             ###> PROJECT VOLUME ###
-            - ${PROJECT_PATH:-../}:/var/www/html
+            - ${PROJECT_PATH:-./}:/var/www/html
         networks:
             - reverse-proxy
             - backend
 
     app:
         build:
-            context: ./app
+            context: docker/app
             args:
                 PHP: ${PHP_VERSION}
                 NAME: ${CONTAINER_NAME:-unnamed}
@@ -49,26 +49,25 @@ services:
             - PHP_IDE_CONFIG=${XDEBUG_SERVER_NAME}
         volumes:
             ###> BASH VOLUMES ###
-            - ./bash/.bash_aliases:/home/${USER}/.bash_aliases
-            - ./bash/.bash_history:/${USER}/.bash_history
-            - ./bash/.bashrc:/home/${USER}/.bashrc
+            - ./docker/bash/.bash_aliases:/home/${USER}/.bash_aliases
+            - ./docker/bash/.bash_history:/${USER}/.bash_history
+            - ./docker/bash/.bashrc:/home/${USER}/.bashrc
             ###> COMPOSER VOLUMES ###
-            - ${COMPOSER_CONFIG_PATH:-./composer/.config}:/home/${USER}/.composer
-            - ${COMPOSER_CACHE_PATH:-./composer/.cache}:/home/${USER}/.cache/composer
+            - ${COMPOSER_CONFIG_PATH:-./docker/composer/.config}:/home/${USER}/.composer
+            - ${COMPOSER_CACHE_PATH:-./docker/composer/.cache}:/home/${USER}/.cache/composer
             ###> TIMEZONE VOLUMES
             - /etc/localtime:/etc/localtime:ro
             ###> PHP INI VOLUME
-            - ./app/php.ini:/usr/local/etc/php/conf.d/custom.php.ini
+            - ./docker/app/php.ini:/usr/local/etc/php/conf.d/custom.php.ini
             ###> PROJECT VOLUME ###
-            - ${PROJECT_PATH:-../}:/var/www/html
-            - ./app/supervisord.conf:/etc/supervisord.conf
+            - ${PROJECT_PATH:-./}:/var/www/html
+            - ./docker/app/supervisord.conf:/etc/supervisord.conf
             ###> XDEBUG ###
-            - ./app/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
-        extra_hosts:
-            - api.pdf.local:${DOCKER_IP}
+            - ./docker/app/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
         networks:
             - backend
             - rabbitmq
+            - minio
 
 networks:
     backend:
@@ -81,4 +80,8 @@ networks:
         
     reverse-proxy:
         name: ${PROXY_NETWORK_NAME:-docker_engine_reverse_proxy}
+        external: true
+        
+    minio:
+        name: ${MINIO_NETWORK_NAME:-pdf_api_minio}
         external: true
